@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>صفحة المشتريات</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .btn-apple-pay {
+      display: inline-block;
+      background: black;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 15px 30px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>صفحة المشتريات</h1>
+  <p>اضغط على الزر أدناه لدفع باستخدام Apple Pay:</p>
+  <button class="btn-apple-pay" id="apple-pay-button">الدفع باستخدام Apple Pay</button>
+
+  <script>
+    // التحقق من دعم Apple Pay في المتصفح
+    if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
+      const applePayButton = document.getElementById("apple-pay-button");
+      
+      applePayButton.addEventListener("click", () => {
+        const paymentRequest = {
+          countryCode: "SA", // رمز الدولة
+          currencyCode: "SAR", // رمز العملة
+          total: {
+            label: "اسم المتجر",
+            amount: "99.99", // المبلغ الإجمالي
+          },
+          supportedNetworks: ["visa", "masterCard", "amex"], // الشبكات المدعومة
+          merchantCapabilities: ["supports3DS"], // دعم 3D Secure
+        };
+
+        const session = new ApplePaySession(3, paymentRequest);
+
+        // التعامل مع نجاح الدفع
+        session.onpaymentauthorized = (event) => {
+          console.log("تم الدفع بنجاح", event.payment);
+          session.completePayment(ApplePaySession.STATUS_SUCCESS);
+          alert("تم الدفع بنجاح!");
+        };
+
+        // بدء الجلسة
+        session.begin();
+      });
+    } else {
+      alert("Apple Pay غير مدعوم على هذا الجهاز!");
+    }
+  </script>
+</body>
+</html>
